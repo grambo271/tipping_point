@@ -16,9 +16,11 @@ from donor import Donor
 
 
 #--- data filenames ---
-donations_csv_filename = 'data/donor_data.csv'
-donations_pickle_filename = 'data/donations.obj'
-donors_pickle_filename = 'data/donors.obj'
+donations_csv_filename = 'data/input/donor_data.csv'
+donations_pickle_filename = 'data/input/donations.obj'
+donors_pickle_filename = 'data/input/donors.obj'
+donations_splunk_output = 'data/splunk/donations.txt'
+donors_splunk_output = 'data/splunk/donors.txt'
 
 
 ##################################################################################################################
@@ -32,6 +34,11 @@ def print_error (error_message, correction_message):
 	print "	---"
 	print "	", correction_message
 	exit ()
+
+
+
+
+
 
 
 
@@ -120,6 +127,22 @@ def load_data (donations_filename, donors_filename):
 	return (donations, donors)
 
 
+##################################################################################################################
+########################[--- DUMPING INTO SPLUNK ---]#############################################################
+##################################################################################################################
+# Function: dump_into_splunk
+# --------------------------
+# given the path to a file to dump into, this function will dump all contacts and donations
+# into the file
+def dump_into_splunk (donors, donations, donors_filename, donations_filename):
+
+	donors_file = open(donors_filename, 'w')
+	for donor in donors:
+		donors_file.write (donor.get_splunk_rep ())
+
+	donations_file = open (donations_filename, 'w')
+	for donation in donations:
+		donations_file.write (donation.get_splunk_rep())
 
 
 
@@ -142,10 +165,11 @@ if __name__ == '__main__':
 		(donations, donors) = load_data (donations_pickle_filename, donors_pickle_filename)
 
 
-	#############
-	for donor in donors:
-		if len(donor.donor_history) == 4:
-			print donor
+	### Step 2: dump into splunk ###
+	print "---> Status: dumping into splunk"
+	dump_into_splunk (donors, donations, donors_splunk_output, donations_splunk_output)
+
+
 
 
 	### Final Step: save data ###

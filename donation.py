@@ -9,6 +9,7 @@ import string
 class Donation:
 
 	#--- instance variables ---
+	date_raw = ''
 	date = ''
 	amount = ''
 	campaign_name = ''
@@ -28,6 +29,7 @@ class Donation:
 	def __init__ (self, date, amount, stage, campaign_name, zip_code, account_id, donation_id):
 
 		#--- date ---
+		self.date_raw = date
 		splits = date.split ('/')
 		self.month = int(splits[0])
 		self.day = int(splits[1])
@@ -66,8 +68,23 @@ class Donation:
 
 
 
+	# Function: get_splunk_rep
+	# ------------------------
+	# returns a splunkable representation of this donation
+	def get_splunk_rep (self):
 
+		break_string = '|||BREAK|||'
+		time_string = "timestamp='" + self.date_raw + "'"
+		year_rep_string = "year_rep='" + str(self.year_rep) + "'"
+		year_string = "year='" + str(self.year) + "'"
+		month_string = "month='" + str(self.month) + "'"
+		day_string = "day='" + str(self.day) + "'"
+		amount_string = "amount='" +  str(self.amount) + "'"
+		campaign_name_string = "campaign_name='" + str(self.campaign_name) + "'"
+		zip_code_string = "zip_code='" + str(self.zip_code) + "'"
+		account_id_string = "account_id='" +  str(self.account_id) + "'"
 
+		return ' '.join ([break_string, time_string, year_rep_string, year_string, month_string, day_string, amount_string, campaign_name_string, zip_code_string, account_id_string])
 
 
 
