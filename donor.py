@@ -8,6 +8,9 @@ import string
 import math
 
 
+#--- zip code information ---
+from pyzipcode import ZipCodeDatabase
+
 class Donor:
 
 	#--- instance variables ---
@@ -30,6 +33,8 @@ class Donor:
 
 	#--- location and other shit ---
 	zip_code = None
+	latitude = None
+	longitude = None
 
 
 
@@ -46,10 +51,25 @@ class Donor:
 		self.donor_history = sorted(donor_history, key=lambda x:x.date)
 		self.num_of_donations = len(self.donor_history)
 
+		#--- time ---
 		self.time_first_raw = self.donor_history[0].date_raw
 		self.time_last_raw = self.donor_history[-1].date_raw
-		self.zip_code = self.donor_history[-1].zip_code
+		
 
+		#--- location ---
+		self.zip_code = self.donor_history[-1].zip_code
+		if len(self.zip_code) == 5:
+			try:
+				zcdb = ZipCodeDatabase ()
+				zip_code = zcdb[self.zip_code]
+				self.latitude = zip_code.latitude
+				self.longitude = zip_code.longitude
+			except:
+				self.latitude = ''
+				self.longitude = ''
+
+
+		#--- higher-level statistics ---
 		self.compute_giving_statistics ()
 
 
@@ -78,7 +98,11 @@ class Donor:
 		break_string = '|||BREAK|||'
 		time_string = "timestamp='" + str(self.time_first_raw) + "'"
 		id_string = "donor_id='" + str(self.donor_id) + "'"
+
+		#--- location ---
 		zip_code_string = "zip_code='" + str(self.zip_code) + "'"
+		latitude_string = "gps_lat='" + str(self.latitude) + "'"
+		longitude_string = "gps_lon='" + str(self.longitude) + "'"
 
 		#--- amount ---
 		num_donations_string = "number_of_donations='" + str(self.num_of_donations) + "'"
@@ -93,7 +117,7 @@ class Donor:
 
 
 
-		return ' '.join ([break_string, time_string, id_string, zip_code_string, num_donations_string, amount_total_string, amount_avg_string, amount_std_dev_string, years_total_string, years_avg_diff_string, years_std_dev_string]) + '\n'
+		return ' '.join ([break_string, time_string, id_string, zip_code_string, latitude_string, longitude_string, num_donations_string, amount_total_string, amount_avg_string, amount_std_dev_string, years_total_string, years_avg_diff_string, years_std_dev_string]) + '\n'
 
 
 
