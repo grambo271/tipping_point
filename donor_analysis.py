@@ -90,8 +90,6 @@ def get_donors (donations):
 		search_id = donations[0].account_id
 		donor_history = [d for d in donations if d.account_id == search_id]
 
-		# print "finding for donor id = ", search_id
-
 		### Step 2: remove all of those donors from the list ###
 		donations = list(set(donations).difference (set(donor_history)))
 
@@ -99,6 +97,7 @@ def get_donors (donations):
 		new_donor = Donor (search_id, donor_history)
 		donors.append (new_donor)
 
+	return donors
 
 # Function: save_data
 # -------------------
@@ -131,6 +130,9 @@ if __name__ == '__main__':
 	load = False
 	save = True
 
+
+
+	### Step 1: get/load the data ###
 	if not load:
 		print "---> Status: extracting data from csv files"
 		donations = get_donations (donations_csv_filename);	
@@ -139,6 +141,14 @@ if __name__ == '__main__':
 		print "---> Status: loading data from pickled files"
 		(donations, donors) = load_data (donations_pickle_filename, donors_pickle_filename)
 
+
+	#############
+	for donor in donors:
+		if len(donor.donor_history) == 4:
+			print donor
+
+
+	### Final Step: save data ###
 	if (save):
 		print "---> Status: pickling data"
 		save_data (donors, donations)
