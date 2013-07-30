@@ -1,0 +1,124 @@
+<view autoCancelInterval="90" isVisible="true" onunloadCancelJobs="true" template="dashboard.html">
+  <label>Tipping Point</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+    </module>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+    </module>
+
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">This map shows total amount donated in an area</param>
+    </module>
+    <module name="HiddenSavedSearch" layoutPanel="panel_row1_col1" autoRun="True" group="Total donations">
+        <param name="savedSearch">donations_sum</param>
+        <module name="GoogleMaps">
+            <param name="height">400px</param>
+            <param name="drilldown">true</param>
+            <param name="drilldown_field">_geo</param>
+            <param name="mapStyles">roadmap</param>
+            <param name="mapType">roadmap</param>
+            <param name="mapTypeControl">off</param>
+            <param name="scrollwheel">off</param>
+            <param name="overlay.rangeMap">0, 1000, 10000, 100000, 1000000</param>
+
+        </module>
+    </module>
+    
+    <module name="HiddenSavedSearch" layoutPanel="panel_row2_col2" group="Mean amount by zip code" autoRun="True">
+    <param name="savedSearch">mean_amount_by_zip</param>
+    <param name="groupLabel">Mean amount by zip code</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+      </param>
+      <param name="savedSearch">mean_amount_by_zip</param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="enable">True</param>
+            <param name="display">False</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">pie</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+                </module>
+                </module>
+              </module>
+          </module>
+                </module>
+              </module>
+    
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1">
+    <param name="replacementMap">
+      <param name="arg">
+        <param name="zip">
+          <param name="value"></param>
+        </param>
+      </param>
+    </param>
+    <param name="field">Zip code</param>
+    <param name="q">*</param>
+    <param name="intention">
+      <param name="name">stringreplace</param>
+      <param name="arg">
+        <param name="zip">
+          <param name="fillOnEmpty">True</param>
+        </param>
+      </param>
+    </param>
+    <module name="SubmitButton">
+      <param name="updatePermalink">True</param>
+      <param name="allowSoftSubmit">True</param>
+      <param name="visible">True</param>
+      <param name="label">Search</param>
+      <module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Amount donated over time" autoRun="False">
+        <param name="search">source="/applications/splunk/etc/apps/tippingpoint/donations.txt" zip_code=$zip$
+          | timechart sum(amount) AS "Amount donated" | rename _time as Time | convert ctime(Time)</param>
+        <param name="groupLabel">amount_graph</param>
+        <module name="ViewstateAdapter">
+          <param name="suppressionList">
+            <item>charting.chart</item>
+          </param>
+          <module name="HiddenFieldPicker">
+            <param name="strictMode">True</param>
+            <module name="JobProgressIndicator">
+              <module name="EnablePreview">
+                <param name="enable">True</param>
+                <param name="display">False</param>
+                <module name="HiddenChartFormatter">
+                  <param name="charting.chart">column</param>
+                  <module name="JSChart">
+                    <param name="width">100%</param>
+                    <module name="Gimp"/>
+                    <module name="ConvertToDrilldownSearch">
+                      <module name="ViewRedirector">
+                        <param name="viewTarget">flashtimeline</param>
+                      </module>
+                    </module>
+                  </module>
+                  <module name="ViewRedirectorLink">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+</view>
