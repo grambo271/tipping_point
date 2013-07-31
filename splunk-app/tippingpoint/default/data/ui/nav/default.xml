@@ -1,5 +1,5 @@
 <nav>
-    <view name="flashtimeline" default='true' />
+    <view name="tippingpoint_main" default='true' />
     <collection label="Views">
         <view source="unclassified" />
         <divider />
