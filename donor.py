@@ -36,6 +36,9 @@ class Donor:
 	latitude = None
 	longitude = None
 
+	#--- feature representation ---
+	features = []
+	cluster = None
 
 
 	##################################################################################################################
@@ -73,18 +76,43 @@ class Donor:
 		self.compute_giving_statistics ()
 
 
+		#--- get feature vector representation ---
+		self.get_feature_vector ()
+
+
+
+	# Function: get_feature_vector
+	# ----------------------------
+	# comes up with a feature vector representation of 
+	# this donor
+	def get_feature_vector (self):
+
+		self.features = []
+
+		#--- amount ---
+		self.features.append (self.num_of_donations)
+		self.features.append (self.amount_average)
+		self.features.append (self.amount_total)
+		self.features.append (self.amount_std_dev)
+
+		#--- timing ---
+		self.features.append (self.years_total)
+		self.features.append (self.years_average_diff)
+
+
+
 
 	# Function: string representation
 	# -------------------------------
 	# returns a string representation of this object. (call print donor, it will work)
 	def __str__ (self):
 
-		top_string = "##########[--- Donor #" + str(self.donor_id) + " ---]##########"
-		amount_stat_string = "Amount: (total, average, std_dev) = (" + str(self.amount_total) + ", " + str(self.amount_average) + ", " + str(self.amount_std_dev) + ")"
-		time_stat_string = "Time: (total, average, std_dev) = (" + str(self.years_total) + ", " + str(self.years_average_diff) + ", " + str(self.years_std_dev) + ")"
-		history_string = '\n'.join([str(s) for s in self.donor_history])
+		intro_string = "###[ " + str(self.donor_id) + "] ###"
+		num_of_donations = "	Number of donations: " + str(self.num_of_donations)
+		amount_string = "	Amount (total, average, std_dev) = ("+ str(self.amount_total) + ", " + str(self.amount_average) + ", " + str(self.amount_std_dev) + ")"
+		time_string = "	Time (years_total, years_average_diff) = (" + str(self.years_total) + ", " + str(self.years_average_diff) + ")"
 
-		return '\n'.join([top_string, amount_stat_string, time_stat_string, history_string])
+		return '\n'.join([intro_string, num_of_donations, amount_string, time_string])
 
 
 
@@ -96,24 +124,24 @@ class Donor:
 
 		#--- break, timestamp and id ---
 		break_string = '|||BREAK|||'
-		time_string = "timestamp='" + str(self.time_first_raw) + "'"
-		id_string = "donor_id='" + str(self.donor_id) + "'"
+		time_string = "timestamp=" + str(self.time_first_raw)
+		id_string = "donor_id=" + str(self.donor_id)
 
 		#--- location ---
-		zip_code_string = "zip_code='" + str(self.zip_code) + "'"
-		latitude_string = "gps_lat='" + str(self.latitude) + "'"
-		longitude_string = "gps_lon='" + str(self.longitude) + "'"
+		zip_code_string = "zip_code=" + str(self.zip_code)
+		latitude_string = "gps_lat=" + str(self.latitude)
+		longitude_string = "gps_lon=" + str(self.longitude)
 
 		#--- amount ---
-		num_donations_string = "number_of_donations='" + str(self.num_of_donations) + "'"
-		amount_total_string = "amount_total='" + str(self.amount_total) + "'"
-		amount_avg_string = "amount_average='" + str(self.amount_average) + "'"
-		amount_std_dev_string = "amount_std_dev='" + str(self.amount_std_dev) + "'"
+		num_donations_string = "number_of_donations=" + str(self.num_of_donations)
+		amount_total_string = "amount_total=" + str(self.amount_total)
+		amount_avg_string = "amount_average=" + str(self.amount_average) 
+		amount_std_dev_string = "amount_std_dev=" + str(self.amount_std_dev)
 
 		#--- time ---
-		years_total_string = "years_total='" + str(self.years_total) + "'"
-		years_avg_diff_string = "years_average_diff='" + str(self.years_average_diff) + "'"
-		years_std_dev_string = "years_std_dev='" + str(self.years_std_dev) + "'"
+		years_total_string = "years_total=" + str(self.years_total)
+		years_avg_diff_string = "years_average_diff=" + str(self.years_average_diff)
+		years_std_dev_string = "years_std_dev=" + str(self.years_std_dev)
 
 
 

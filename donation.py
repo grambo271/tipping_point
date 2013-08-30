@@ -92,27 +92,27 @@ class Donation:
 
 		#--- break and timestamp ---
 		break_string = '|||BREAK|||'
-		time_string = "timestamp='" + self.date_raw + "'"
+		time_string = "timestamp=" + self.date_raw + "'"
 
 		#--- time ---
-		year_rep_string = "year_rep='" + str(self.year_rep) + "'"
-		year_string = "year='" + str(self.year) + "'"
-		month_string = "month='" + str(self.month) + "'"
-		day_string = "day='" + str(self.day) + "'"
+		year_rep_string = "year_rep=" + str(self.year_rep)
+		year_string = "year=" + str(self.year)
+		month_string = "month=" + str(self.month)
+		day_string = "day=" + str(self.day)
 		
 		#--- ammount ---
-		amount_string = "amount='" +  str(self.amount) + "'"
+		amount_string = "amount=" +  str(self.amount)
 
 		#--- location ---
-		zip_code_string = "zip_code='" + str(self.zip_code) + "'"
-		latitude_string = "gps_lat='" + str(self.latitude) + "'"
-		longitude_string = "gps_lon='" + str(self.longitude) + "'"
+		zip_code_string = "zip_code=" + str(self.zip_code)
+		latitude_string = "gps_lat=" + str(self.latitude)
+		longitude_string = "gps_lon=" + str(self.longitude)
 
 		#--- account id/campaign name ---
-		account_id_string = "account_id='" +  str(self.account_id) + "'"
+		account_id_string = "account_id=" +  str(self.account_id)
 		campaign_name_string = "campaign_name='" + str(self.campaign_name) + "'"
 
-		return ' '.join ([break_string, time_string, year_rep_string, year_string, month_string, day_string, amount_string, campaign_name_string, zip_code_string, latitude_string, longitude_string, account_id_string])
+		return ' '.join ([break_string, time_string, year_rep_string, year_string, month_string, day_string, amount_string, campaign_name_string, zip_code_string, latitude_string, longitude_string, account_id_string]) + '\n'
 
 
 
