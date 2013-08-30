@@ -6,17 +6,13 @@
     <param name="clearOnJobDispatch">False</param>
     <param name="maxSize">1</param>
     </module>
-  <module name="Message" layoutPanel="messaging">
-    <param name="filter">splunk.search.job</param>
-    <param name="clearOnJobDispatch">True</param>
-    <param name="maxSize">1</param>
-    </module>
+
 
   <module name="StaticContentSample" layoutPanel="panel_row1_col1">
     <param name="text">This map shows total amount donated in an area</param>
     </module>
-    <module name="HiddenSavedSearch" layoutPanel="panel_row1_col1" autoRun="True" group="Total donations">
-        <param name="savedSearch">donations_sum</param>
+    <module name="HiddenSearch" layoutPanel="panel_row1_col1" autoRun="True" group="Total donations">
+        <param name="search">source="/applications/splunk/etc/apps/tippingpoint/donations.txt" | eval _geo = gps_lat+","+gps_lon| eval _geo_count=amount</param>
         <module name="GoogleMaps">
             <param name="height">400px</param>
             <param name="drilldown">true</param>
@@ -29,10 +25,45 @@
 
         </module>
     </module>
+    <module name="StaticContentSample" layoutPanel="panel_row1_col2">
+      <param name="text">This map shows number of donors by location</param>
+      </module>
+    <module name="HiddenSearch" layoutPanel="panel_row1_col2" autoRun="True" group="Donors">
+        <param name="search">source="/applications/splunk/etc/apps/tippingpoint/donors.txt" | eval _geo = gps_lat+","+gps_lon</param>
+        <module name="GoogleMaps">
+            <param name="height">400px</param>
+            <param name="drilldown">true</param>
+            <param name="drilldown_field">_geo</param>
+            <param name="mapStyles">roadmap</param>
+            <param name="mapType">roadmap</param>
+            <param name="mapTypeControl">off</param>
+            <param name="scrollwheel">off</param>
+            <param name="overlay.rangeMap">0, 50, 100, 500, 1000</param>
+
+        </module>
+    </module>
     
-    <module name="HiddenSavedSearch" layoutPanel="panel_row2_col2" group="Mean amount by zip code" autoRun="True">
+    <module name="StaticContentSample" layoutPanel="panel_row2_col2">
+      <param name="text">This map shows number of major donors by location</param>
+      </module>
+    <module name="HiddenSearch" layoutPanel="panel_row2_col2" autoRun="True" group="Major Donors">
+        <param name="search">source="/applications/splunk/etc/apps/tippingpoint/donors.txt" amount_total > 25000 | eval _geo = gps_lat+","+gps_lon</param>
+        <module name="GoogleMaps">
+            <param name="height">400px</param>
+            <param name="drilldown">true</param>
+            <param name="drilldown_field">_geo</param>
+            <param name="mapStyles">roadmap</param>
+            <param name="mapType">roadmap</param>
+            <param name="mapTypeControl">off</param>
+            <param name="scrollwheel">off</param>
+            <param name="overlay.rangeMap">0, 50, 100, 500, 1000</param>
+
+        </module>
+    </module>
+    
+    <module name="HiddenSavedSearch" layoutPanel="panel_row2_col1" group="Average donation amount by zip code" autoRun="True">
     <param name="savedSearch">mean_amount_by_zip</param>
-    <param name="groupLabel">Mean amount by zip code</param>
+    <param name="groupLabel">Average donation amount by zip code</param>
     <module name="ViewstateAdapter">
       <param name="suppressionList">
         <item>charting.chart</item>
@@ -62,7 +93,7 @@
                 </module>
               </module>
     
-    <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1">
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row3_col1">
     <param name="replacementMap">
       <param name="arg">
         <param name="zip">
@@ -85,7 +116,7 @@
       <param name="allowSoftSubmit">True</param>
       <param name="visible">True</param>
       <param name="label">Search</param>
-      <module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Amount donated over time" autoRun="False">
+      <module name="HiddenSearch" layoutPanel="panel_row3_col1" group="Amount donated over time" autoRun="False">
         <param name="search">source="/applications/splunk/etc/apps/tippingpoint/donations.txt" zip_code=$zip$
           | timechart sum(amount) AS "Amount donated" | rename _time as Time | convert ctime(Time)</param>
         <param name="groupLabel">amount_graph</param>
@@ -114,6 +145,118 @@
                     <param name="viewTarget">flashtimeline</param>
                   </module>
                 </module>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+        <module name="HiddenSearch" layoutPanel="panel_row4_col1" group="Number of donations by amount (buckets in power of 2)" autoRun="True">
+    <param name="search">sourcetype="tippingpoint" | eval new_amount=floor(log(amount,2)) | eval real_amount=pow(2,new_amount) | chart count by real_amount</param>
+    <param name="earliest">0</param>
+    <param name="groupLabel">histogram_numbers_log2buckets</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>count</item>
+        <item>displayRowNumbers</item>
+        <item>charting.chart</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="enable">True</param>
+            <param name="display">False</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">column</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+        <module name="HiddenSearch" layoutPanel="panel_row5_col1" group="New major donors by year ($25k+ donated total)" autoRun="True">
+    <param name="groupLabel">majordonors</param>
+    <param name="search">sourcetype="tippingpoint" | eval real_id = if(isnotnull(account_id), account_id, donor_id) | eventstats min(year) as time by real_id | search amount_total > 25000 | chart count by time</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+      </param>
+ 
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="enable">True</param>
+            <param name="display">False</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">line</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  </module>
+    <module name="HiddenSearch" layoutPanel="panel_row6_col1" group="Long time donors (2+ years of giving) who gave, by year" autoRun="True">
+    <param name="groupLabel">longtime donors by year</param>
+    <param name="search">sourcetype="tippingpoint" | eval real_id = if(isnotnull(account_id), account_id, donor_id) | eventstats min(year) as firstyear by real_id | eval longtime=if((year - firstyear) > 2, "yes", "no") | search longtime="yes" | chart count by year</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.legend.placement</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.layout.splitSeries</item>
+        <item>charting.chart</item>
+      </param>
+ 
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="enable">True</param>
+            <param name="display">False</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart.nullValueMode">gaps</param>
+              <param name="charting.legend.placement">right</param>
+              <param name="charting.chart">line</param>
+              <param name="charting.layout.splitSeries">false</param>
+              <param name="charting.chart.stackMode">default</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
               </module>
             </module>
           </module>
